@@ -1,69 +1,77 @@
-import React, { useState, useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import React, { useState } from "react";
+import { createNewUser } from "../API";
 import { useNavigate } from "react-router-dom";
-import Modal from "./Modal";
 
-const Register = ({ onClose }) => {
-  const [username, setUsername] = useState("");
+const Register = ({ setToken }) => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { register } = useContext(AuthContext);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
-    setLoading(true);
-    setError(null); // Reset the error message
-
-    try {
-      const userData = await register({ username, email, password });
-      if (userData) {
-        onClose(); // Close the modal or redirect to the login page
-        navigate("/login"); // Redirect to login after successful registration
-      } else {
-        setError("Registration failed. Please try again.");
-      }
-    } catch (err) {
-      setError("An error occurred during registration. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const response = await createNewUser(firstName, lastName, email, password);
+    const result = await response;
+    setToken(result.token);
+    setFirstName("");
+    setLastName("");
+    setEmail("");
+    setPassword("");
+    navigate("/users/login");
+  }
 
   return (
-    <Modal onClose={onClose}>
-      <h2>Register</h2>
-      {error && <p className="error">{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <label>Username</label>
-        <input
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-        />
-        <label>Email</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <label>Password</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? "Registering..." : "Register"}
-        </button>
-      </form>
-      <button onClick={onClose}>Back to Login</button>
-    </Modal>
+    <div>
+      <>
+        <h2 className="unauthorized">Register New Account</h2>
+        <div className="registration">
+          <form onSubmit={handleSubmit}>
+            <label>
+              First name:{" "}
+              <input
+                placeholder="First name"
+                type="text"
+                onChange={(e) => setFirstName(e.target.value)}
+              />
+            </label>
+            <br />
+            <br />
+            <label>
+              Last name:{" "}
+              <input
+                placeholder="Last name"
+                type="text"
+                onChange={(e) => setLastName(e.target.value)}
+              />
+            </label>
+            <br />
+            <br />
+            <label>
+              Email:{" "}
+              <input
+                placeholder="Email"
+                type="email"
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </label>
+            <br />
+            <br />
+            <label>
+              Password:{" "}
+              <input
+                placeholder="Password"
+                type="password"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </label>
+            <br />
+            <br />
+            <button className="login-button">Submit</button>
+          </form>
+        </div>
+      </>
+    </div>
   );
 };
 

@@ -1,63 +1,58 @@
-import React, { useState, useEffect } from "react";
-import { fetchBooks, fetchSingleBook } from "../API"; // Ensure the path is correct
-import SingleBookModal from "../components/SingleBookModal"; // Only import once
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { fetchAllBooks } from "../API";
 
-const AllBooks = () => {
+export default function Books() {
+  const navigate = useNavigate();
   const [books, setBooks] = useState([]);
-  const [selectedBook, setSelectedBook] = useState(null);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    fetchBooks()
-      .then((fetchedBooks) => setBooks(fetchedBooks))
-      .catch((error) => setError(error.message))
-      .finally(() => setLoading(false));
+    async function getAllBooks() {
+      const response = await fetchAllBooks();
+      setBooks(response.books);
+    }
+    getAllBooks();
   }, []);
 
-  const handleBookClick = async (bookId) => {
-    try {
-      const bookDetails = await fetchSingleBook(bookId);
-      setSelectedBook(bookDetails);
-    } catch (error) {
-      console.error("Error fetching book details:", error);
-      setError("Failed to fetch book details");
-    }
-  };
-
-  const closeModal = () => {
-    setSelectedBook(null);
-  };
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
+  const booksToDisplay = searchTerm
+    ? books.filter((book) =>
+        book.title.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : books;
 
   return (
-    <div id="books-container">
-      <h1>Pim's Library</h1>
-      <div className="book-grid">
-        {books.map((book) => (
-          <div
-            key={book.id}
-            className="book-card"
-            onClick={() => handleBookClick(book.id)}
-            style={{ cursor: "pointer" }}
-          >
-            <img
-              src={book.coverimage}
-              alt={`Cover of ${book.title}`}
-              className="book-image"
-            />
-            <h3>{book.title}</h3>
-            <h5>by {book.author}</h5>
-          </div>
-        ))}
+    <>
+      <div className="search">
+        <label>
+          <input
+            type="text"
+            placeholder="Search by title"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </label>
       </div>
-      {selectedBook && (
-        <SingleBookModal book={selectedBook} onClose={closeModal} />
-      )}
-    </div>
+      <div className="main-div">
+        {booksToDisplay &&
+          booksToDisplay.map((book) => (
+            <main
+              className="all-books"
+              key={book.id}
+              onClick={() => {
+                navigate(`/books/${book.id}`);
+              }}
+            >
+              <h2>{book.title}</h2>
+              <img
+                className="cover"
+                src={book.coverimage}
+                alt={`${book.title} cover`}
+              />
+              <h5>by {book.author}</h5>
+            </main>
+          ))}
+      </div>
+    </>
   );
-};
-
-export default AllBooks;
+}

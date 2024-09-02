@@ -1,44 +1,70 @@
-// src/pages/Account.jsx
-import React, { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../context/AuthContext";
-import { fetchBooks } from "../API/index";
+import React, { useEffect, useState } from "react";
+import { fetchUserDetails, returnBook } from "../API";
 
-const Account = () => {
-  const { user } = useContext(AuthContext);
-  const [checkedOutBooks, setCheckedOutBooks] = useState([]);
-
+const Account = ({ token, setToken }) => {
+  const [userData, setUserData] = useState(null);
+  const fetchUserData = async () => {
+    const response = await fetchUserDetails(token);
+    setUserData(response);
+  };
   useEffect(() => {
-    // Assuming you fetch the user's checked-out books here
-    const loadCheckedOutBooks = async () => {
-      // Mocked checked out books for now
-      const books = await fetchBooks();
-      setCheckedOutBooks(books.filter((book) => book.checkedOutBy === user.id));
-    };
-
-    if (user) {
-      loadCheckedOutBooks();
+    if (token) {
+      fetchUserData();
     }
-  }, [user]);
+  }, []);
 
   return (
-    <div className="account-page">
-      <h1>My Account</h1>
-      {user ? (
-        <>
-          <p>Email: {user.email}</p>
-          <h2>Checked Out Books:</h2>
-          {checkedOutBooks.length > 0 ? (
-            <ul>
-              {checkedOutBooks.map((book) => (
-                <li key={book.id}>{book.title}</li>
-              ))}
-            </ul>
-          ) : (
-            <p>You have no books checked out.</p>
-          )}
-        </>
+    <div>
+      {userData ? (
+        <div>
+          <h2 className="header">Welcome, {userData.firstname}!</h2>
+          <h2 className="header">Email: {userData.email}</h2>
+          <h1 className="header">My Books</h1>
+          <div className="main-div">
+            <br />
+            {userData.books.length === 0 ? (
+              <h2 className="header">No books checked out</h2>
+            ) : (
+              userData.books.map((book) => (
+                <main key={book.id} className="all-books">
+                  <h2>{book.title}</h2>
+                  <img
+                    className="cover"
+                    src={book.coverimage}
+                    alt={book.title}
+                  />
+                  <h5>by {book.author}</h5>
+                  <button
+                    className="return-button"
+                    onClick={async () => {
+                      await returnBook(book.id, token);
+                      await fetchUserData();
+                    }}
+                  >
+                    Return
+                  </button>
+                </main>
+              ))
+            )}
+          </div>
+        </div>
       ) : (
-        <p>You need to log in to view this page.</p>
+        <div className="unauthorized">
+          <h2>Please log in or create an account to continue.</h2>
+        </div>
+      )}
+      {token && (
+        <div className="registration">
+          <button
+            className="logout-button"
+            onClick={async () => {
+              setToken("");
+              await fetchUserData();
+            }}
+          >
+            Log out
+          </button>
+        </div>
       )}
     </div>
   );

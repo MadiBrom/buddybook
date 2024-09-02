@@ -1,35 +1,53 @@
-// src/pages/SingleBook.jsx
-import React, { useEffect, useState } from "react";
+import { fetchSingleBook } from "../API";
 import { useParams } from "react-router-dom";
-import { fetchSingleBook } from "../API/index";
+import { useEffect, useState } from "react";
+import { checkBook } from "../API";
 
-const SingleBook = () => {
-  const { id } = useParams();
+export default function SingleBook({ token }) {
   const [book, setBook] = useState(null);
+  const [isCheckedOut, setIsCheckedOut] = useState(false);
+  const { id } = useParams();
 
   useEffect(() => {
-    const loadBook = async () => {
-      const fetchedBook = await fetchSingleBook(id);
-      setBook(fetchedBook);
-    };
+    async function fetchBook() {
+      const response = await fetchSingleBook(id);
+      setBook(response.book);
+    }
 
-    loadBook();
-  }, [id]);
+    fetchBook();
+  }, []);
+
+  const handleCheckout = async () => {
+    await checkBook(book.id, token, false);
+    setIsCheckedOut(true);
+  };
 
   return (
-    <div className="book-details">
-      {book ? (
-        <>
-          <h1>{book.title}</h1>
-          <p>{book.author}</p>
-          <p>{book.description}</p>
-          <button>Add to Cart</button>
-        </>
-      ) : (
-        <p>Loading book details...</p>
+    <>
+      {book && (
+        <div className="single-main">
+          <main className="single-book" key={book.id}>
+            <h2>{book.title}</h2>
+            <img className="cover" src={book.coverimage} />
+            <h3>by {book.author}</h3>
+            <p>{book.description}</p>
+            {token && book.available && !isCheckedOut && (
+              <button className="checkout-button" onClick={handleCheckout}>
+                Check out
+              </button>
+            )}
+            {isCheckedOut && <p className="red-text">Checked out</p>}
+            {!token && book.available && (
+              <p className="red-text">
+                Please log in or register to check out this title.
+              </p>
+            )}
+            {!book.available && (
+              <p className="red-text">This book is currently unavailable.</p>
+            )}
+          </main>
+        </div>
       )}
-    </div>
+    </>
   );
-};
-
-export default SingleBook;
+}

@@ -1,30 +1,70 @@
-// src/App.jsx
-import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import AllBooks from "./pages/AllBooks";
+import { useState } from "react";
+import { Routes, Route } from "react-router-dom";
+import Books from "./pages/AllBooks";
+import Navigations from "./components/NavBar";
 import SingleBook from "./pages/SingleBook";
 import Login from "./components/Login";
 import Register from "./components/Register";
-import Account from "./components/Account"; // Updated path
-import NavBar from "./components/NavBar";
-import { AuthProvider } from "./context/AuthContext";
-import "./App.css";
+import Account from "./components/Account";
+import { getReservations } from "./API";
+import { useEffect } from "react";
 
 function App() {
+  const [token, setToken] = useState(null);
+  const [searchParams, setSearchParams] = useState("");
+  const [reservations, setReservations] = useState([]);
+
+  useEffect(() => {
+    if (token) {
+      const fetchReservations = async () => {
+        const response = await getReservations(token);
+        setReservations(response);
+      };
+
+      fetchReservations();
+    }
+  }, []);
+
   return (
-    <AuthProvider>
-      <Router>
-        <NavBar />
+    <>
+      <div id="navigation">
+        <Navigations setSearchParams={setSearchParams} token={token} />
+      </div>
+      <h1 className="header">Library App</h1>
+      <div id="book-div">
         <Routes>
-          <Route path="/books" element={<AllBooks />} />
-          <Route path="/books/:id" element={<SingleBook />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/account" element={<Account />} /> {/* Corrected path */}
-          <Route path="/" element={<AllBooks />} />
+          <Route
+            path="/"
+            element={
+              <Books
+                searchParams={searchParams}
+                setSearchParams={setSearchParams}
+              />
+            }
+          />
+          <Route path="books/:id" element={<SingleBook token={token} />} />
+          <Route
+            path="/users/login"
+            element={<Login token={token} setToken={setToken} />}
+          />
+          <Route
+            path="/users/register"
+            element={<Register token={token} setToken={setToken} />}
+          />
+          <Route
+            path="/users/me"
+            element={
+              <Account
+                token={token}
+                setToken={setToken}
+                reservations={reservations}
+                setReservations={setReservations}
+              />
+            }
+          />
         </Routes>
-      </Router>
-    </AuthProvider>
+      </div>
+    </>
   );
 }
 

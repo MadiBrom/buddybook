@@ -1,26 +1,25 @@
-import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
 
-const NavBar = () => {
-  const { user, logout } = useContext(AuthContext);
-
+export default function Navigations({ token }) {
   return (
-    <nav className="navbar">
-      <Link to="/">Home</Link>
-      {user ? (
-        <>
-          <span>{user.email}</span>
-          <button onClick={logout}>Logout</button>
-        </>
-      ) : (
-        <>
-          <Link to="/login">Login</Link>
-          <Link to="/register">Register</Link>
-        </>
-      )}
-    </nav>
-  );
-};
+    <div className="navbar">
+      <Link to="/">
+        <button className="nav-button">Home</button>
+      </Link>
 
-export default NavBar;
+      {!token && (
+        <Link to="/users/login">
+          <button className="nav-button">Login</button>
+        </Link>
+      )}
+      {!token && (
+        <Link to="/users/register">
+          <button className="nav-button">Register</button>
+        </Link>
+      )}
+      <Link to="/users/me">
+        <button className="nav-button">My Account</button>
+      </Link>
+    </div>
+  );
+}
