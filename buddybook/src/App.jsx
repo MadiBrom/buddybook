@@ -3,11 +3,11 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavBar from "./components/NavBar";
 import AllBooks from "./pages/AllBooks";
 import SingleBook from "./pages/SingleBook";
-import AccountPage from "./pages/AccountPage";
-import CartPage from "./pages/CartPage";
+import Account from "./pages/AccountPage";
+import Cart from "./pages/CartPage";
 import Login from "./components/Login";
 import Register from "./components/Register";
-import "./App.css"; // Link to your App.css
+import "./App.css"; // Global CSS
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 
@@ -20,8 +20,8 @@ function App() {
           <Routes>
             <Route path="/books" element={<AllBooks />} />
             <Route path="/books/:id" element={<SingleBook />} />
-            <Route path="/account" element={<AccountPage />} />
-            <Route path="/cart" element={<CartPage />} />
+            <Route path="/account" element={<Account />} />
+            <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
           </Routes>
