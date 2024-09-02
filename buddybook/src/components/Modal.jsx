@@ -1,11 +1,12 @@
 import React from "react";
 
-const Modal = ({ isOpen, onClose, children }) => {
-  if (!isOpen) return null;
-
+const Modal = ({ onClose, children }) => {
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-backdrop">
+      <div className="modal-content">
+        <button className="modal-close" onClick={onClose}>
+          &times;
+        </button>
         {children}
       </div>
     </div>

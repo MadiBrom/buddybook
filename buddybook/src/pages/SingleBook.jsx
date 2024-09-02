@@ -1,23 +1,33 @@
-import React from "react";
+// src/pages/SingleBook.jsx
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { fetchSingleBook } from "../API/index";
 
-const SingleBook = ({ books }) => {
+const SingleBook = () => {
   const { id } = useParams();
-  const book = books.find((b) => b.id === parseInt(id));
+  const [book, setBook] = useState(null);
 
-  if (!book) return <p>Book not found</p>;
+  useEffect(() => {
+    const loadBook = async () => {
+      const fetchedBook = await fetchSingleBook(id);
+      setBook(fetchedBook);
+    };
+
+    loadBook();
+  }, [id]);
 
   return (
-    <div className="book-container">
-      <div className="bookcard">
-        <img src={book.coverImageUrl} alt={book.title} />
-        <h1 id="titles">{book.title}</h1>
-        <p id="info">{book.author}</p>
-        <div id="describe">
-          <p id="description">{book.description}</p>
-        </div>
-        <button className="add-cart">Add to Cart</button>
-      </div>
+    <div className="book-details">
+      {book ? (
+        <>
+          <h1>{book.title}</h1>
+          <p>{book.author}</p>
+          <p>{book.description}</p>
+          <button>Add to Cart</button>
+        </>
+      ) : (
+        <p>Loading book details...</p>
+      )}
     </div>
   );
 };

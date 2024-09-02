@@ -29,10 +29,9 @@ h5 {
   font-style: normal;
   font-size: 150%;
   display: flex;
-  flex-wrap: wrap; /* Allows items to wrap to the next row */
-  gap: 20px; /* Space between the cards */
-  justify-content: center; /* Center the cards horizontally */
-  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
   margin-top: 120px; /* Adjust as needed for your layout */
 }
 
@@ -68,7 +67,6 @@ h5 {
   font-size: 16px;
 }
 
-/* Button Focus State */
 button:focus {
   outline: 2px solid #f0caba;
   outline-offset: 2px;
@@ -118,13 +116,21 @@ button:focus {
   }
 }
 
+/* Book Grid */
+.book-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: flex-start;
+  flex: 1; /* Take up remaining space */
+}
+
 /* Book Card Styles */
 .book-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 250px;
-  max-width: 300px;
   padding: 15px;
   background-color: #705240c0;
   box-shadow: 5px 10px 10px black;
@@ -150,41 +156,29 @@ button:focus {
 /* Book Card Text */
 .book-card h3 {
   margin: 10px 0 5px;
-  font-size: 20px; /* Adjusted for better readability */
+  font-size: 20px;
 }
 
 .book-card h5 {
   margin: 0;
-  font-size: 16px; /* Adjusted for better readability */
+  font-size: 16px;
 }
 
-/* Responsive Book Card Styles */
-.bookcard {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background-color: #705240c0;
-  box-shadow: 5px 10px 15px rgba(0, 0, 0, 0.6);
-  color: #d8d8d8;
-  text-align: center;
-  border-radius: 15px;
-  max-width: 800px;
-  width: 100%;
-  margin: auto;
-}
+/* Responsive Design */
+@media (max-width: 768px) {
+  .books-container {
+    flex-direction: column;
+    align-items: center;
+  }
 
-/* Responsive Book Card Image */
-.bookcard img {
-  width: 80%;
-  max-width: 200px;
-  height: auto;
-  object-fit: cover;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  margin-top: 15px;
-  box-shadow: 2px 5px 5px black;
+  .book-grid {
+    justify-content: center;
+  }
+
+  .book-card {
+    width: 100%;
+    max-width: 300px;
+  }
 }
 
 /* Book Details */
@@ -350,10 +344,13 @@ button:focus {
 }
 
 /* Modal Text */
-.modal-content p {
-  margin: 10px 0;
-  font-size: 1rem;
-  color: #333;
+.modal-content p.error {
+  color: red;
+  margin-bottom: 10px;
+}
+
+.modal-content h2 {
+  margin-bottom: 20px;
 }
 
 /* Cart Styles */
@@ -427,4 +424,20 @@ button,
 button:hover,
 .navbar .nav-links a:hover {
   transform: scale(1.05);
+}
+
+/* Close Button for Modal */
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.close-button:hover {
+  color: #f00;
 }

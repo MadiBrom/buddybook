@@ -1,47 +1,44 @@
+// src/pages/Account.jsx
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
-import "./App.css"; // Use your global CSS
+import { fetchBooks } from "../API/index";
 
 const Account = () => {
-  const { user, logout } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const [checkedOutBooks, setCheckedOutBooks] = useState([]);
 
   useEffect(() => {
+    // Assuming you fetch the user's checked-out books here
+    const loadCheckedOutBooks = async () => {
+      // Mocked checked out books for now
+      const books = await fetchBooks();
+      setCheckedOutBooks(books.filter((book) => book.checkedOutBy === user.id));
+    };
+
     if (user) {
-      // Fetch the checked out books
-      fetchCheckedOutBooks(user.id);
+      loadCheckedOutBooks();
     }
   }, [user]);
 
-  const fetchCheckedOutBooks = async (userId) => {
-    try {
-      // Replace with your actual API call to fetch checked out books
-      const response = await fetch(`/api/users/${userId}/checked-out-books`);
-      const data = await response.json();
-      setCheckedOutBooks(data);
-    } catch (err) {
-      console.error("Failed to fetch checked out books:", err);
-    }
-  };
-
-  if (!user) {
-    return <p>Please log in to view your account information.</p>;
-  }
-
   return (
     <div className="account-page">
-      <h2>My Account</h2>
-      <p>Email: {user.email}</p>
-      <button onClick={logout}>Logout</button>
-      <h3>Checked Out Books</h3>
-      {checkedOutBooks.length > 0 ? (
-        <ul>
-          {checkedOutBooks.map((book) => (
-            <li key={book.id}>{book.title}</li>
-          ))}
-        </ul>
+      <h1>My Account</h1>
+      {user ? (
+        <>
+          <p>Email: {user.email}</p>
+          <h2>Checked Out Books:</h2>
+          {checkedOutBooks.length > 0 ? (
+            <ul>
+              {checkedOutBooks.map((book) => (
+                <li key={book.id}>{book.title}</li>
+              ))}
+            </ul>
+          ) : (
+            <p>You have no books checked out.</p>
+          )}
+        </>
       ) : (
-        <p>You have no books checked out.</p>
+        <p>You need to log in to view this page.</p>
       )}
     </div>
   );
